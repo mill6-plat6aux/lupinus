@@ -10,9 +10,9 @@
 </div>
 
 
-I know there are many API testing tools that seem easy to use at first glance, but I honestly don't trust them because they store OpenAPI specifications and authentication information in some online storage without permission.
+I know there are many API testing tools that seem easy to use at first glance, but I honestly don't trust them because they store OpenAPI specifications and authentication information in some online storage without permission 🤢
 
-But what lupinus does is really simple, so please try it.
+But what lupinus does is really simple, so please try it 😘
 
 
 ## Architecture
