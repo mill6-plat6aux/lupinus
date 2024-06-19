@@ -1,7 +1,7 @@
 {
   "name": "lupinus",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.9.1",
+  "description": "API Server Testing Tool",
   "main": "index.js",
   "types": "index.d.ts",
   "bin": {
