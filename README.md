@@ -1,11 +1,13 @@
-<center>
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="images/title-w.png"/>
-        <img src="images/title-b.png"/>
-    </picture>
+<div align="center">
+    <div>
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="https://github.com/mill6-plat6aux/lupinus/raw/main/images/title-w.png"/>
+            <img src="https://github.com/mill6-plat6aux/lupinus/raw/main/images/title-b.png" width="320"/>
+        </picture>
+    </div>
     API Server Testing Tool
     <br/><br/><br/>
-</center>
+</div>
 
 
 I know there are many API testing tools that seem easy to use at first glance, but I honestly don't trust them because they store OpenAPI specifications and authentication information in some online storage without permission.
