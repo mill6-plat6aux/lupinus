@@ -580,7 +580,7 @@ class Validator {
                 });
             }
         }else if(schema.type == "object") {
-            if(typeof data != "object") {
+            if(data == null || typeof data != "object") {
                 throw ValidationError(schema, data, "Type mismatch.");
             }
             Object.keys(data).forEach(key => {
