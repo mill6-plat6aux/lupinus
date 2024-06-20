@@ -94,7 +94,7 @@ npx lupinus --spec oas.yaml --testcase testcases.yaml --log log.yaml
 
 ## Developers
 
-Takuro Okada
+[Takuro Okada](mill6.plat6aux@gmail.com)
 
 
 ---
