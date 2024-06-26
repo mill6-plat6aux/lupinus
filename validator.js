@@ -555,7 +555,7 @@ class Validator {
 
         if(schema.type == "array") {
             if(!Array.isArray(data)) {
-                throw ValidationError(schema, data, "Type mismatch.");
+                throw ValidationError(schema, data, "Type mismatch.", key);
             }
             if(schema.maxItems != null) {
                 if(data.length > schema.maxItems) {
@@ -581,12 +581,15 @@ class Validator {
             }
         }else if(schema.type == "object") {
             if(data == null || typeof data != "object") {
-                throw ValidationError(schema, data, "Type mismatch.");
+                throw ValidationError(schema, data, "Type mismatch.", key);
             }
             Object.keys(data).forEach(key => {
                 if(schema.properties != null) {
                     let value = data[key];
                     let valueSchema = schema.properties[key];
+                    if(valueSchema == null) {
+                        throw ValidationError(schema, value, "Schema not found.", key);
+                    }
                     if(valueSchema["$ref"] != null) {
                         let _valueSchema = this.getComponent(valueSchema["$ref"]);
                         if(_valueSchema != null) {
