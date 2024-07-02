@@ -64,6 +64,14 @@ class Validator {
             }
         }
 
+        if(logSetting == null) {
+            logSetting = {
+                waitForWriting: true
+            };
+        }else if(typeof logSetting == "object" && logSetting.waitForWriting == null) {
+            logSetting.waitForWriting = true;
+        }
+
         this.logger = new Logger(undefined, logSetting);
         this.verbose = verboseLog != null ? verboseLog : false;
     }

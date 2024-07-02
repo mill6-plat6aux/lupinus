@@ -1,12 +1,17 @@
 {
   "name": "lupinus",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "API Server Testing Tool",
   "main": "index.js",
   "types": "index.d.ts",
   "bin": {
     "lupinus": "cli.js"
   },
+  "files": [
+    "*.js",
+    "*.ts",
+    "*.json"
+  ],
   "author": "Takuro Okada",
   "license": "MIT",
   "dependencies": {

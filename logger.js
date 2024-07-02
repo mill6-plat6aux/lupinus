@@ -5,7 +5,7 @@
 
 // @ts-check
 
-const { readFileSync, appendFile } = require("fs");
+const { readFileSync, appendFile, appendFileSync } = require("fs");
 const YAML = require("js-yaml");
 
 const LogLevel = {
@@ -22,6 +22,7 @@ exports.LogLevel = LogLevel;
  * @property {"debug"|"info"|"warning"|"error"|"critical"} [threshold]
  * @property {string} [output]
  * @property {string} [errorOutput]
+ * @property {boolean} [waitForWriting]
  */
 
 class Logger {
@@ -30,6 +31,8 @@ class Logger {
 
     #output;
     #errorOutput;
+
+    #waitForWriting = false;
 
     /**
      * @param {string} [caller] 
@@ -81,8 +84,17 @@ class Logger {
         if(_setting.errorOutput != null && typeof _setting.errorOutput == "string") {
             this.#errorOutput = _setting.errorOutput;
         }
+
+        if(_setting.waitForWriting != null && typeof _setting.waitForWriting == "boolean") {
+            this.#waitForWriting = _setting.waitForWriting;
+        }
     }
 
+    /**
+     * @param {string} message 
+     * @param {number} [logLevel] 
+     * @param {boolean} [force] 
+     */
     writeLog(message, logLevel, force) {
         if(logLevel == undefined) {
             logLevel = 2;
@@ -93,12 +105,21 @@ class Logger {
         message = this.dateString() + " " + message + "\n";
         if(this.#output !== undefined) {
             message = message.replaceAll(/\u001b\[[0-9]{1,2}m/g, "");
-            appendFile(this.#output, message, function(){});
+            if(this.#waitForWriting) {
+                appendFileSync(this.#output, message);
+            }else {
+                appendFile(this.#output, message, function(){});
+            }
         }else {
             process.stdout.write(message);
         }
     }
     
+    /**
+     * @param {string} message 
+     * @param {number} [logLevel] 
+     * @param {boolean} [force] 
+     */
     writeError(message, logLevel, force) {
         if(logLevel == undefined) {
             logLevel = 4;
@@ -109,7 +130,11 @@ class Logger {
         message = this.dateString() + " " + message + "\n";
         if(this.#errorOutput !== undefined) {
             message = message.replaceAll(/\u001b\[[0-9]{1,2}m/g, "");
-            appendFile(this.#errorOutput, message, function(){});
+            if(this.#waitForWriting) {
+                appendFileSync(this.#errorOutput, message);
+            }else {
+                appendFile(this.#errorOutput, message, function(){});
+            }
         }else {
             process.stderr.write(message);
         }
