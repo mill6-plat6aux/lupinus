@@ -327,6 +327,9 @@ class Validator {
                 if(responseSpec["$ref"] == null) {
                     let responseContentType = response.headers["content-type"];
                     if(responseContentType != null) {
+                        if(responseContentType.includes(";")) {
+                            responseContentType = responseContentType.substring(0, responseContentType.indexOf(";")).trim();
+                        }
                         let mediaType = responseSpec["content"][responseContentType];
                         if(mediaType != null && mediaType.schema != null) {
                             let schema = mediaType.schema;
