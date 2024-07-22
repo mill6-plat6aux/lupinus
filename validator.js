@@ -122,19 +122,20 @@ class Validator {
             await this.invoke(contextPath, testCase.sequence, 0, []);
         }catch(error) {
             /**
+             * @param {Logger} logger
              * @param {Error} error 
              */
-            function logError(error) {
+            function logError(logger, error) {
                 if(!(error instanceof ErrorContainer)) {
-                    this.logger.writeLog(`\u001b[31mNG\u001b[0m ${error.message}`);
-                    this.logger.writeLog(error.stack, LogLevel.debug);
+                    logger.writeLog(`\u001b[31mNG\u001b[0m ${error.message}`);
+                    logger.writeLog(error.stack, LogLevel.debug);
                 }else {
                     error.errors.forEach(_error => {
-                        logError(_error);
+                        logError(logger, _error);
                     })
                 }
             }
-            logError(error);
+            logError(this.logger, error);
         }
         if(index+1 < testCases.length) {
             await this.executeTestCases(testCases, index+1);
