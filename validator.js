@@ -121,8 +121,20 @@ class Validator {
         try {
             await this.invoke(contextPath, testCase.sequence, 0, []);
         }catch(error) {
-            this.logger.writeLog(`\u001b[31mNG\u001b[0m ${error.message}`);
-            this.logger.writeLog(error.stack, LogLevel.debug);
+            /**
+             * @param {Error} error 
+             */
+            function logError(error) {
+                if(!(error instanceof ErrorContainer)) {
+                    this.logger.writeLog(`\u001b[31mNG\u001b[0m ${error.message}`);
+                    this.logger.writeLog(error.stack, LogLevel.debug);
+                }else {
+                    error.errors.forEach(_error => {
+                        logError(_error);
+                    })
+                }
+            }
+            logError(error);
         }
         if(index+1 < testCases.length) {
             await this.executeTestCases(testCases, index+1);
@@ -600,6 +612,7 @@ class Validator {
             if(data == null || typeof data != "object") {
                 throw ValidationError(schema, data, "Type mismatch.", key);
             }
+            let errors = [];
             Object.keys(data).forEach(key => {
                 if(schema.properties != null) {
                     let value = data[key];
@@ -613,9 +626,16 @@ class Validator {
                             valueSchema = _valueSchema;
                         }
                     }
-                    this.validateJson(value, valueSchema, key);
+                    try {
+                        this.validateJson(value, valueSchema, key);
+                    }catch(error) {
+                        errors.push(error);
+                    }
                 }
             });
+            if(errors.length > 0) {
+                throw new ErrorContainer(errors);
+            }
         }else if(schema.type == "string") {
             if(enableCast != undefined && enableCast) {
                 data = data.toString();
@@ -771,3 +791,14 @@ class Validator {
     }
 }
 exports.Validator = Validator;
+
+class ErrorContainer extends Error {
+
+    /**
+     * @param {Array<Error>} errors 
+     */
+    constructor(errors) {
+        super();
+        this.errors = errors;
+    }
+}
