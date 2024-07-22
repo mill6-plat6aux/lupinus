@@ -433,24 +433,119 @@ class Validator {
         let results = [];
         definition.replace(/{([^}]+)}/g, (source, target) => {
             let result = true;
-            target.replace(/^([a-zA-Z0-9_.*\(\)\[\]@<>=!$]+) ([=><!]+) ([a-zA-Z0-9_.*\(\)\[\]@<>=!$]+)$/, (source, operand1, operator, operand2) => {
-                operand1 = this.replaceContext(operand1, context);
-                operand1 = this.replaceResponse(operand1, response);
-                operand2 = this.replaceContext(operand2, context);
-                operand2 = this.replaceResponse(operand2, response);
+            target.replace(/^([a-zA-Z0-9_.*\(\)\[\]@<>=!$'":-]+) ([=><!]+|in) ([a-zA-Z0-9_.*\(\)\[\]@<>=!$'":-]+)$/, (source, operand1, operator, operand2) => {
+                if(/^'.+'$/.test(operand1) || /^".+"$/.test(operand1)) {
+                    operand1 = operand1.substring(1, operand1.length-1);
+                }else {
+                    operand1 = this.replaceContext(operand1, context);
+                    operand1 = this.replaceResponse(operand1, response);
+                }
+
+                if(/^'.+'$/.test(operand2) || /^".+"$/.test(operand1)) {
+                    operand2 = operand2.substring(1, operand2.length-1);
+                }else {
+                    operand2 = this.replaceContext(operand2, context);
+                    operand2 = this.replaceResponse(operand2, response);
+                }
 
                 if(operator == "=" || operator == "==") {
-                    result = this.castAsComparable(operand1) == this.castAsComparable(operand2);
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.length == operand2.length && operand1.every(entry1 => operand2.some(entry2 => this.castAsComparable(entry1) == this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.every(entry => this.castAsComparable(entry) == this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.every(entry => this.castAsComparable(entry) == this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) == this.castAsComparable(operand2);
+                        }
+                    }
                 }else if(operator == "<") {
-                    result = this.castAsComparable(operand1) < this.castAsComparable(operand2);
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.length == operand2.length && operand1.every(entry1 => operand2.every(entry2 => this.castAsComparable(entry1) < this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.every(entry => this.castAsComparable(entry) < this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.every(entry => this.castAsComparable(entry) > this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) < this.castAsComparable(operand2);
+                        }
+                    }
                 }else if(operator == "<=") {
-                    result = this.castAsComparable(operand1) <= this.castAsComparable(operand2);
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.length == operand2.length && operand1.every(entry1 => operand2.every(entry2 => this.castAsComparable(entry1) <= this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.every(entry => this.castAsComparable(entry) <= this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.every(entry => this.castAsComparable(entry) >= this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) <= this.castAsComparable(operand2);
+                        }
+                    }
                 }else if(operator == ">") {
-                    result = this.castAsComparable(operand1) > this.castAsComparable(operand2);
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.length == operand2.length && operand1.every(entry1 => operand2.every(entry2 => this.castAsComparable(entry1) > this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.every(entry => this.castAsComparable(entry) > this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.every(entry => this.castAsComparable(entry) < this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) > this.castAsComparable(operand2);
+                        }
+                    }
                 }else if(operator == ">=") {
-                    result = this.castAsComparable(operand1) >= this.castAsComparable(operand2);
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.length == operand2.length && operand1.every(entry1 => operand2.every(entry2 => this.castAsComparable(entry1) >= this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.every(entry => this.castAsComparable(entry) >= this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.every(entry => this.castAsComparable(entry) <= this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) >= this.castAsComparable(operand2);
+                        }
+                    }
                 }else if(operator == "!=") {
-                    result = this.castAsComparable(operand1) != this.castAsComparable(operand2);
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.length == operand2.length && operand1.every(entry1 => operand2.every(entry2 => this.castAsComparable(entry1) != this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.every(entry => this.castAsComparable(entry) != this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.every(entry => this.castAsComparable(entry) != this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) != this.castAsComparable(operand2);
+                        }
+                    }
+                }else if(operator == "in") {
+                    if(Array.isArray(operand1)) {
+                        if(Array.isArray(operand2)) {
+                            result = operand1.every(entry1 => operand2.some(entry2 => this.castAsComparable(entry1) == this.castAsComparable(entry2)));
+                        }else {
+                            result = operand1.some(entry => this.castAsComparable(entry) == this.castAsComparable(operand2));
+                        }
+                    }else {
+                        if(Array.isArray(operand2)) {
+                            result = operand2.some(entry => this.castAsComparable(entry) == this.castAsComparable(operand1));
+                        }else {
+                            result = this.castAsComparable(operand1) == this.castAsComparable(operand2);
+                        }
+                    }
                 }
                 return source;
             });
@@ -475,11 +570,11 @@ class Validator {
     /**
      * @param {string} definition 
      * @param {any} response 
-     * @returns {string}
+     * @returns {string|Array<string>}
      */
     replaceResponse(definition, response) {
         let values = JSONPath.query(response, definition);
-        return values.length > 0 ? values[0] : definition;
+        return values.length == 1 ? values[0] : (values.length > 1 ? values : definition);
     }
 
     /**
@@ -489,7 +584,7 @@ class Validator {
     castAsComparable(data) {
         if(/^[0-9.]+$/.test(data)) {
             return Number(data);
-        }else if(/^[0-9]{4}-[0-9]{2}-[0-9]{2}(T|t)[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|z|(\+|-)[0-9]{2}:[0-9]{2})$/.test(data)) {
+        }else if(/^[0-9]{4}-[0-9]{2}-[0-9]{2}(T|t)[0-9]{2}:[0-9]{2}:[0-9]{2}(.[0-9]{3}|.[0-9]{6})*(Z|z|(\+|-)[0-9]{2}:[0-9]{2})$/.test(data)) {
             return new Date(data).getTime();
         }else if(data == "null") {
             return null;
@@ -665,7 +760,7 @@ class Validator {
                 }
             }
             if(schema.format != null) {
-                if(schema.format == "date-time" && !/^[0-9]{4}-[0-9]{2}-[0-9]{2}(T|t)[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|z|(\+|-)[0-9]{2}:[0-9]{2})$/.test(data)) {
+                if(schema.format == "date-time" && !/^[0-9]{4}-[0-9]{2}-[0-9]{2}(T|t)[0-9]{2}:[0-9]{2}:[0-9]{2}(.[0-9]{3}|.[0-9]{6})*(Z|z|(\+|-)[0-9]{2}:[0-9]{2})$/.test(data)) {
                     throw ValidationError(schema, data, "Format mismatch.");
                 }else if(schema.format == "date" && !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(data)) {
                     throw ValidationError(schema, data, "Format mismatch.");
