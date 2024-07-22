@@ -172,6 +172,12 @@ class Validator {
         let requestHeaders;
         if(invoke.request != null) {
             requestHeaders = invoke.request.headers;
+            
+            Object.keys(requestHeaders).forEach(key => {
+                if(requestHeaders[key] === undefined) {
+                    delete requestHeaders[key];
+                }
+            });
         }
         if(requestHeaders != null) {
             if(requestHeaders["authorization"] != null || requestHeaders["Authorization"] != null) {
