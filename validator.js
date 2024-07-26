@@ -328,7 +328,13 @@ class Validator {
             this.logger.writeLog(`RESPONSE:`);
             this.logger.writeLog(`Status: ${response.status}`);
             this.logger.writeLog(JSON.stringify(response.headers));
-            this.logger.writeLog(JSON.stringify(response.body));
+            if(response.body instanceof Buffer) {
+                this.logger.writeLog(response.body.toString("utf8"));
+            }else if(typeof response.body == "object") {
+                this.logger.writeLog(JSON.stringify(response.body));
+            }else {
+                this.logger.writeLog(response.body);
+            }
         }
         
         if(operation.responses != null && response.status != null) {
