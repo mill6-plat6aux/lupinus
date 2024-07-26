@@ -716,6 +716,13 @@ class Validator {
             }
             let errors = [];
             Object.keys(data).forEach(key => {
+                if(schema.required != null) {
+                    schema.required.forEach(key => {
+                        if(data[key] === undefined) {
+                            throw ValidationError(schema, undefined, "Required property is not included.", key);
+                        }
+                    });
+                }
                 if(schema.properties != null) {
                     let value = data[key];
                     let valueSchema = schema.properties[key];
