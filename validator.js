@@ -126,7 +126,7 @@ class Validator {
              * @param {Error} error 
              */
             function logError(logger, error) {
-                if(!(error instanceof ErrorContainer)) {
+                if(!(error instanceof AggregateError)) {
                     logger.writeLog(`\u001b[31mNG\u001b[0m ${error.message}`);
                     logger.writeLog(error.stack, LogLevel.debug);
                 }else {
@@ -743,7 +743,7 @@ class Validator {
                 }
             });
             if(errors.length > 0) {
-                throw new ErrorContainer(errors);
+                throw new AggregateError(errors);
             }
         }else if(schema.type == "string") {
             if(enableCast != undefined && enableCast) {
@@ -900,14 +900,3 @@ class Validator {
     }
 }
 exports.Validator = Validator;
-
-class ErrorContainer extends Error {
-
-    /**
-     * @param {Array<Error>} errors 
-     */
-    constructor(errors) {
-        super();
-        this.errors = errors;
-    }
-}
