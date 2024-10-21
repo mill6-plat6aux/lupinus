@@ -294,6 +294,28 @@ class Validator {
                                 throw new Error(`Parameter [${parameter.name}] is required.`);
                             }
                         }
+                    }else if(parameter.in == "path" && parameter.name != null) {
+                        if(requestBody != null) {
+                            let value = requestBody[parameter.name];
+                            if(value !== undefined) {
+                                if(typeof value == "string") {
+                                    value = this.replaceBrackets(value, context);
+                                }
+                                if(parameter.schema != null) {
+                                    this.validateJson(value, parameter.schema, parameter.name, true);
+                                }
+                                delete requestBody[parameter.name];
+                                requestPath = requestPath.replace("{"+parameter.name+"}", encodeURIComponent(value));
+                            }else {
+                                if(parameter.required != null && parameter.required) {
+                                    throw new Error(`Parameter [${parameter.name}] is required.`);
+                                }
+                            }
+                        }else {
+                            if(parameter.required != null && parameter.required) {
+                                throw new Error(`Parameter [${parameter.name}] is required.`);
+                            }
+                        }
                     }
                 }else {
                     let component = this.getComponent(parameter["$ref"]);
@@ -768,7 +790,7 @@ class Validator {
                 }
             }
             if(schema.pattern != null) {
-                if(!new RegExp(schema.pattern).test(data)) {
+                if(!new RegExp(schema.pattern.replaceAll("\\\\", "\\")).test(data)) {
                     throw ValidationError(schema, data, "The value does not follow format.", key);
                 }
             }
