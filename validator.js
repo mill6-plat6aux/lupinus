@@ -633,53 +633,63 @@ class Validator {
             if(schema.oneOf.length == 0) {
                 throw new Error(`Schema is invalid.\n${JSON.stringify(schema, null, 4)}`);
             }
-            let error;
+            let _error;
             let result = schema.oneOf.some(_schema => {
                 try {
                     this.validateJson(data, _schema, key);
                 }catch(error) {
-                    error = error;
+                    _error = error;
                     return false;
                 }
                 return true;
             });
             if(!result) {
-                throw error;
+                throw _error;
             }
+            return;
         }else if(schema.anyOf != null) {
             if(schema.anyOf.length == 0) {
                 throw new Error(`Schema is invalid.\n${JSON.stringify(schema, null, 4)}`);
             }
-            let error;
+            let _error;
             let result = schema.anyOf.some(_schema => {
                 try {
                     this.validateJson(data, _schema, key);
                 }catch(error) {
-                    error = error;
+                    _error = error;
                     return false;
                 }
                 return true;
             });
             if(!result) {
-                throw error;
+                throw _error;
             }
+            return;
         }else if(schema.allOf != null) {
             if(schema.allOf.length == 0) {
                 throw new Error(`Schema is invalid.\n${JSON.stringify(schema, null, 4)}`);
             }
-            let error;
+            let _error;
             let result = schema.allOf.every(_schema => {
                 try {
                     this.validateJson(data, _schema, key);
                 }catch(error) {
-                    error = error;
+                    _error = error;
                     return false;
                 }
                 return true;
             });
             if(!result) {
-                throw error;
+                throw _error;
             }
+            return;
+        }else if(schema.not != null) {
+            try {
+                this.validateJson(data, schema.not, key);
+            }catch(error) {
+                return;
+            }
+            throw ValidationError(schema, data, "The data meets a negative condition.", key);
         }
 
         if(schema["$ref"] != null) {
